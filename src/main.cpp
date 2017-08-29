@@ -1,5 +1,9 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>      // std::out_of_range
+#include <cstdio>       //EOF
+#include <vector>
+#include <string>
 
 //https://github.com/janl/mustache.js/ - See all the possibilities
 //https://mustache.github.io/mustache.5.html - All items
@@ -8,32 +12,47 @@
 namespace mustache {
     constexpr size_t min_string_len = 4;
 
-    class Elements {
-        std::string data;
+    enum class ElementTypes {
+        TAG,
+        TEXT
+    };
+
+    class Element {
+        std::string m_data;
+        ElementTypes m_type;
     public:
-        void add(const char a) noexcept {
-            data += a;
+
+        Element(std::string a, ElementTypes m = ElementTypes::TEXT) : m_data(a), m_type(m) {
+        };
+        
+        std::string getData() const {
+            return m_data;
         }
     };
 
-    class Tag : public Elements {
-    };
-
-    class Text : public Elements {
+    enum class Mode {
+        TEXT,
+        TAG_END_SEARCH
     };
 
     class Lexer {
-        std::string text;
+        std::string m_text;
 
-        std::string TagStart = "{{";
-        std::string TagEnd = "}}";
+        std::string m_TagStart = "{{";
+        std::string m_TagEnd = "}}";
 
-        std::size_t position = 0;
-        std::size_t position_marker = 0;
-        std::string::size_type size;
+        std::size_t m_position = 0;
+        std::size_t m_position_marker = 0;
+        std::string::size_type m_size;
 
-        const char &getChar() noexcept {
-            return text.at(position);
+        std::vector<Element> m_elements;
+
+        const char getChar() noexcept {
+            try {
+                return m_text.at(m_position);
+            } catch (const std::out_of_range& oor) {
+                return EOF;
+            }
         }
 
         void charGoFowardUntil(char a) noexcept {
@@ -41,31 +60,26 @@ namespace mustache {
         }
 
         void charBack() noexcept {
-            position--;
+            m_position--;
         }
 
         void charNext() noexcept {
-            position++;
+            m_position++;
         }
 
         void mark_position() {
-            position_marker = position;
+            m_position_marker = m_position;
         }
 
         void reset_position_to_marker() {
-            position = position_marker;
+            m_position = m_position_marker;
         }
 
-        bool isTagStart() {
+        bool isTagPart(std::string part) {
             mark_position();
             bool is_tag = false;
-            std::cout << "current char: " << getChar() << '\n';
 
-            for (const char &s : TagStart) {
-                if (s == '\n') {
-                    break;
-                }
-
+            for (const char &s : part) {
                 if (s == getChar()) {
                     charNext();
                     is_tag = true;
@@ -75,38 +89,76 @@ namespace mustache {
                 is_tag = false;
                 break;
             }
-
-            if (is_tag == false)
+            
+            if (is_tag == false) {
                 reset_position_to_marker();
-
+            }
             return is_tag;
         }
-        
-        void lex() {            
-            while (position < size) {
-                if (isTagStart()) {
 
-                } else {
-                    //create Text holder
+        bool isTagStart() {
+            return isTagPart(m_TagStart);
+        }
+
+        bool isTagEnd() {
+            return isTagPart(m_TagEnd);
+        }
+
+        void lex() {
+            Mode mode = Mode::TEXT;
+            size_t pos = 0;
+
+            while (getChar() != EOF) {
+                switch (mode) {
+                    case Mode::TEXT:
+                        if (isTagStart()) {
+                            if (m_position > 0) {
+                                size_t len = m_position - m_TagEnd.length();
+                                m_elements.emplace_back(m_text.substr(pos, len));
+                                pos = len;
+                            }
+
+                            mode = Mode::TAG_END_SEARCH;
+                        }
+                        break;
+
+                    case Mode::TAG_END_SEARCH:
+                        if (isTagEnd()) {                            
+                            m_elements.emplace_back(
+                                    m_text.substr(pos, m_position),
+                                    ElementTypes::TAG
+                            );
+
+                            pos = m_position;
+                            mode = Mode::TEXT;
+                        }
+                        break;
                 }
+
                 charNext();
             }
         }
 
-    public:       
+    public:
         
-        Lexer(const std::string &str) : text(str), size(str.size()) {
-            if (size <= min_string_len) {
+        void dump_elements() {
+            for (const auto &i : m_elements) {
+                std::cout << i.getData() << '\n';                
+            }
+        }
+
+        Lexer(const std::string &str) : m_text(str), m_size(str.size()) {
+            if (m_size <= min_string_len) {
                 throw "String too small";
             }
 
             lex();
         }
-        
+
         void lex(const std::string &str) {
-            text = str;
-            size = str.size();
-            
+            m_text = str;
+            m_size = str.size();
+
             lex();
         }
 
@@ -115,11 +167,13 @@ namespace mustache {
 }
 
 int main(int argc, char **argv) {
-    std::string mustache_string{"Hello {{name}}"};
+    std::string mustache_string{"Hello teste assadas asdasd asdsda a{{name}} sss {{bla}}"};
     //std::string mustache_string{"Hll"};
 
     try {
         mustache::Lexer lex{mustache_string};
+        
+        lex.dump_elements();
     } catch (char const *e) {
         std::cout << "Error: " << e << '\n';
     }
