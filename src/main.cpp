@@ -8,7 +8,7 @@
 //https://github.com/janl/mustache.js/ - See all the possibilities
 //https://mustache.github.io/mustache.5.html - All items
 //https://mustache.github.io/mustache.1.html - cli
-
+/*
 namespace mustache {
     constexpr size_t min_string_len = 4;
 
@@ -165,11 +165,11 @@ namespace mustache {
 
     };
 }
-
+*/
 int main(int argc, char **argv) {
     std::string mustache_string{"Text1 {{tag1}} Text2 {{Tag2}}"};
     //std::string mustache_string{"Hll"};
-
+/*
     try {
         mustache::Lexer lex{mustache_string};
         
@@ -177,6 +177,7 @@ int main(int argc, char **argv) {
     } catch (char const *e) {
         std::cout << "Error: " << e << '\n';
     }
+ * */
     //lexer -> Create tokens 
 
 
