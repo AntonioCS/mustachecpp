@@ -113,7 +113,7 @@ namespace mustache {
                     case Mode::TEXT:
                         if (isTagStart()) {
                             if (m_position > 0) {
-                                size_t len = m_position - m_TagEnd.length();
+                                size_t len = m_position - m_TagEnd.length() - pos;
                                 m_elements.emplace_back(m_text.substr(pos, len));
                                 pos = len;
                             }
@@ -125,7 +125,7 @@ namespace mustache {
                     case Mode::TAG_END_SEARCH:
                         if (isTagEnd()) {                            
                             m_elements.emplace_back(
-                                    m_text.substr(pos, m_position),
+                                    m_text.substr(pos, m_position - pos),
                                     ElementTypes::TAG
                             );
 
@@ -167,7 +167,7 @@ namespace mustache {
 }
 
 int main(int argc, char **argv) {
-    std::string mustache_string{"Hello teste assadas asdasd asdsda a{{name}} sss {{bla}}"};
+    std::string mustache_string{"Text1 {{tag1}} Text2 {{Tag2}}"};
     //std::string mustache_string{"Hll"};
 
     try {
