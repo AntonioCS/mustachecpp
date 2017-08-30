@@ -19,6 +19,9 @@ dir_guard=@mkdir -p $(@D)
 
 all: $(TARGET)
 
+test_lexer: src/Lexer.cpp tests/LexerTest.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
 $(TARGET): $(OBJ)
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
