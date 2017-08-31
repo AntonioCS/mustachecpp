@@ -25,6 +25,10 @@ $(TARGET): $(OBJ)
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+tests: $(TEST_MAIN) $(OBJ) tests/LexerTest.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
+
+
 #To cause recompile when .h files are change
 $(OBJ):	$(SRC) $(HEADERS)
 	$(dir_guard)
@@ -33,11 +37,8 @@ $(OBJ):	$(SRC) $(HEADERS)
 	@mv *.o $(OBJ_DIR)
 
 
-test_lexer: $(TEST_MAIN) src/Lexer.cpp tests/LexerTest.cpp
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
-
 $(TEST_MAIN): tests/tests-main.cpp
-	$(CC) -c -o $(TEST_MAIN) $^
+	$(CC) $(CFLAGS) -c -o $(TEST_MAIN) $^
 
 
 clean:
