@@ -1,29 +1,27 @@
 #include "Lexer.h"
+#include <iostream>
 
 namespace mustache {
 
-    Lexer::Lexer(const std::string &str) : m_text(str), m_size(str.size()) {
-        if (m_size <= min_string_len) {
-            throw "String too small";
-        }
-
-        lex();
-    }
-
-    Lexer::Lexer(const Lexer& orig) {
+    Lexer::Lexer(const std::string &str) {
+        lex(str);
     }
 
     Lexer::~Lexer() {
     }
 
-    void Lexer::lex(const std::string &str) {
-        m_text = str;
-        m_size = str.size();
+    void Lexer::dump_elements() const {
 
-        lex();
+        for (const auto &i : m_elements) {
+            std::cout << i.getData() << '\n';
+        }
     }
 
-    const char &Lexer::getChar() const noexcept {
+    std::vector<LexerElement> Lexer::getElements() const noexcept {
+        return m_elements;
+    }
+
+    const char Lexer::getChar() const noexcept {
         try {
             return m_text.at(m_position);
         } catch (const std::out_of_range& oor) {
@@ -52,6 +50,17 @@ namespace mustache {
         return is_tag;
     }
 
+    void Lexer::lex(const std::string &str) {
+        if (str.size() <= min_string_len) {
+            throw "String too small";
+        }
+
+        m_text = str;
+        m_size = str.size();
+
+        lex();
+    }
+
     void Lexer::lex() {
         Mode mode = Mode::TEXT;
         size_t pos = 0;
@@ -63,7 +72,8 @@ namespace mustache {
                         if (m_position > 0) {
                             size_t len = m_position - m_TagEnd.length() - pos;
                             m_elements.emplace_back(m_text.substr(pos, len));
-                            pos = len;
+
+                            pos = m_position - m_TagEnd.length();
                         }
 
                         mode = Mode::TAG_END_SEARCH;
@@ -72,10 +82,7 @@ namespace mustache {
 
                 case Mode::TAG_END_SEARCH:
                     if (isTagEnd()) {
-                        m_elements.emplace_back(
-                                m_text.substr(pos, m_position - pos),
-                                ElementTypes::TAG
-                                );
+                        m_elements.emplace_back(m_text.substr(pos, m_position - pos), LexerElementTypes::TAG);
 
                         pos = m_position;
                         mode = Mode::TEXT;
