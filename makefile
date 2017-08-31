@@ -11,16 +11,15 @@ SRC=$(shell find $(SRC_DIR) -name '*.cpp')
 HEADERS=$(shell find $(SRC_DIR) -name '*.h')
 #https://www.gnu.org/software/make/manual/html_node/Text-Functions.html
 OBJ=$(addprefix $(OBJ_DIR)/,$(notdir $(patsubst %.cpp, %.o, $(SRC))))
+TEST_MAIN=$(OBJ_DIR)/tests-main.o
 
 #http://stackoverflow.com/a/1951111/8715
 dir_guard=@mkdir -p $(@D)
 
+
 .PHONY: clean
 
 all: $(TARGET)
-
-test_lexer: src/Lexer.cpp tests/LexerTest.cpp
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(TARGET): $(OBJ)
 	$(dir_guard)
@@ -33,5 +32,13 @@ $(OBJ):	$(SRC) $(HEADERS)
 #Put all the object files in the correct directory
 	@mv *.o $(OBJ_DIR)
 
+
+test_lexer: $(TEST_MAIN) src/Lexer.cpp tests/LexerTest.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
+
+$(TEST_MAIN): tests/tests-main.cpp
+	$(CC) -c -o $(TEST_MAIN) $^
+
+
 clean:
-	rm -rf $(TARGET) $(OBJ_DIR)/*
+	rm -rf $(BUILD_DIR)/* $(OBJ_DIR)/*
