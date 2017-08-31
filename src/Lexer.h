@@ -2,11 +2,14 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <vector>
+#include <string>
 #include <stdexcept>      // std::out_of_range
 #include <cstdio>       //EOF
 #include "LexerElement.h"
 
 namespace mustache {
+    constexpr size_t min_string_len = 4;
 
     enum class Mode {
         TEXT,
@@ -25,7 +28,7 @@ namespace mustache {
 
         std::vector<LexerElement> m_elements;
 
-        const char &getChar() const noexcept;
+        const char getChar() const noexcept;
 
         void charBack() noexcept {
             m_position--;
@@ -60,11 +63,10 @@ namespace mustache {
 
         void lex(const std::string &str);
 
-        void dump_elements() {
-            for (const auto &i : m_elements) {
-                std::cout << i.getData() << '\n';
-            }
-        }
+        void dump_elements() const ;
+
+        std::vector<LexerElement> getElements() const noexcept;
+
     };
 }
 #endif /* LEXER_H */
