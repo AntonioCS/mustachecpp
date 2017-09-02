@@ -13,7 +13,7 @@ namespace mustache {
     void Lexer::dump_elements() const {
 
         for (const auto &i : m_elements) {
-            std::cout << i.getData() << '\n';
+            std::cout << " - " << i.getData() << '\n';
         }
     }
 
@@ -69,10 +69,11 @@ namespace mustache {
             switch (mode) {
                 case Mode::TEXT:
                     if (isTagStart()) {
-                        if (m_position > 0) {
-                            size_t len = m_position - m_TagEnd.length() - pos;
-                            m_elements.emplace_back(m_text.substr(pos, len));
-
+                        //It will be zero if a tag is the first element
+                        size_t len = m_position - m_TagEnd.length() - pos;
+                        if (len > 0) {
+                            addElementFromText(pos, len);
+                            //m_elements.emplace_back(m_text.substr(pos, len));
                             pos = m_position - m_TagEnd.length();
                         }
 
@@ -82,7 +83,9 @@ namespace mustache {
 
                 case Mode::TAG_END_SEARCH:
                     if (isTagEnd()) {
-                        m_elements.emplace_back(m_text.substr(pos, m_position - pos), LexerElementTypes::TAG);
+                        m_total_tags++;
+                        addElementFromText(pos, m_position - pos, LexerElementTypes::TAG);
+                        //m_elements.emplace_back(m_text.substr(pos, m_position - pos), LexerElementTypes::TAG);
 
                         pos = m_position;
                         mode = Mode::TEXT;
@@ -92,7 +95,14 @@ namespace mustache {
 
             charNext();
         }
+
+        if (mode == Mode::TAG_END_SEARCH) {
+            throw "Mustache-Lexer - Unfinished tag";
+        }
+
+        //It's all text
+        if (mode == Mode::TEXT && m_total_tags == 0) {
+            addElementFromText(0, m_position);
+        }
     }
-
-
 }
