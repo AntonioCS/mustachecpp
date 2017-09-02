@@ -2,10 +2,10 @@ BIN=mustachecpp
 BUILD_DIR=./build
 OBJ_DIR=./obj
 TARGET=$(BUILD_DIR)/$(BIN)
-CFLAGS=-std=c++14 -Wall -g -Werror
+CXXFLAGS=-std=c++14 -Wall -g -Werror
 LDFLAGS=
 LDLIBS=
-CC=g++
+CXX=g++
 SRC_DIR=./src
 SRC=$(shell find $(SRC_DIR) -name '*.cpp')
 HEADERS=$(shell find $(SRC_DIR) -name '*.h')
@@ -23,22 +23,23 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(dir_guard)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 tests: $(TEST_MAIN) $(OBJ) tests/LexerTest.cpp
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$@ $^ $(LDLIBS)
 
 
 #To cause recompile when .h files are change
-$(OBJ):	$(SRC) $(HEADERS)
+$(OBJ):	$(SRC) 
+#$(HEADERS)
 	$(dir_guard)
-	$(CC) $(CFLAGS) -c $? $(LDLIBS)
+	$(CXX) $(CXXFLAGS) -c $? $(LDLIBS)
 #Put all the object files in the correct directory
 	@mv *.o $(OBJ_DIR)
 
 
 $(TEST_MAIN): tests/tests-main.cpp
-	$(CC) $(CFLAGS) -c -o $(TEST_MAIN) $^
+	$(CXX) $(CXXFLAGS) -c -o $(TEST_MAIN) $^
 
 
 clean:
