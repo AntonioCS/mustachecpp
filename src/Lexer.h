@@ -18,6 +18,7 @@ namespace mustache {
 
     class Lexer {
         std::string m_text;
+        size_t m_total_tags{0};
 
         std::string m_TagStart{"{{"};
         std::string m_TagEnd{"}}"};
@@ -56,6 +57,10 @@ namespace mustache {
             return isTagPart(m_TagEnd);
         }
 
+        void addElementFromText(size_t start, size_t length, LexerElementTypes type = LexerElementTypes::TEXT) noexcept {
+            m_elements.emplace_back(m_text.substr(start, length), type);
+        }
+
         void lex();
     public:
         Lexer(const std::string &str);
@@ -63,7 +68,7 @@ namespace mustache {
 
         void lex(const std::string &str);
 
-        void dump_elements() const ;
+        void dump_elements() const;
 
         std::vector<LexerElement> getElements() const noexcept;
 
