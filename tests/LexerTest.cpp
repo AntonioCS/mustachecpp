@@ -14,6 +14,51 @@ TEST_CASE("Lexer return correct elements", "[lexer]") {
     REQUIRE(res.at(3).getData() == "{{Tag2}}");
 }
 
+TEST_CASE("Tag start", "[lexer]") {
+    mustache::Lexer lex{"{{ tag0 }} Text1 {{tag1}} Text2 {{Tag2}}"};
+    const auto res = lex.getElements();
+
+    REQUIRE(res.size() == 5);
+
+    REQUIRE(res.at(0).getData() == "{{ tag0 }}");
+    REQUIRE(res.at(1).getData() == " Text1 ");
+    REQUIRE(res.at(2).getData() == "{{tag1}}");
+    REQUIRE(res.at(3).getData() == " Text2 ");
+    REQUIRE(res.at(4).getData() == "{{Tag2}}");
+}
+
+TEST_CASE("No tags", "[lexer]") {
+    std::string text{"Hello World!"};
+    mustache::Lexer lex{text};
+    const auto res = lex.getElements();
+
+    REQUIRE(res.size() == 1);
+    REQUIRE(res.at(0).getData() == text);
+}
+
+TEST_CASE("All tags", "[lexer]") {
+    mustache::Lexer lex{"{{tag1}}{{tag2}}{{tag3}}"};
+    const auto res = lex.getElements();
+
+    REQUIRE(res.size() == 3);
+    REQUIRE(res.at(0).getData() == "{{tag1}}");
+    REQUIRE(res.at(1).getData() == "{{tag2}}");
+    REQUIRE(res.at(2).getData() == "{{tag3}}");
+}
+
+TEST_CASE("Unfinished tag Exception", "[lexer]") {
+    REQUIRE_THROWS_WITH(
+        []{
+            mustache::Lexer lex{"{{tag1"};
+        }(),
+        "Mustache-Lexer - Unfinished tag" //Exception message
+    );
+}
+
+
+
+
+/*
 TEST_CASE("Lexer change delimiter", "[lexer]") {
 
     mustache::Lexer lex{"*{{default_tags}} {{=<% %>=}} * <% erb_style_tags %> <%={{ }}=%> * {{ default_tags_again }}"};
@@ -21,6 +66,6 @@ TEST_CASE("Lexer change delimiter", "[lexer]") {
 
     lex.dump_elements();
     //REQUIRE(res.size() == 4);
-}
+}*/
 
 
