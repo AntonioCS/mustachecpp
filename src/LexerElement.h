@@ -6,22 +6,27 @@
 
 namespace mustache {
 
-    enum class LexerElementTypes {
+    enum class LexerElementType {
         TAG,
         TEXT
     };
 
     class LexerElement {
         std::string m_data;
-        LexerElementTypes m_type;
+        LexerElementType m_type;
     public:
 
-        LexerElement(std::string data, LexerElementTypes m = LexerElementTypes::TEXT) : m_data(data), m_type(m) {
+        LexerElement(std::string data, LexerElementType m = LexerElementType::TEXT) : m_data(data), m_type(m) {
         };
 
-        std::string getData() const {
+        std::string getData() const noexcept {
             return m_data;
         }
+
+        LexerElementType getType() const noexcept {
+            return m_type;
+        }
+
     };
 }
 #endif /* LEXERELEMENT_H */
