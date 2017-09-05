@@ -31,10 +31,14 @@ namespace mustache {
 
     bool Lexer::isTagPart(std::string part) noexcept {
         mark_position();
-        bool is_tag = false;
+        int loops{0};
+        bool is_tag{false};
 
         for (const char &s : part) {
-            if (s == getChar()) {
+            auto c = getChar();
+            loops++;
+
+            if (s == c) {
                 charNext();
                 is_tag = true;
                 continue;
@@ -45,6 +49,7 @@ namespace mustache {
         }
 
         if (is_tag == false) {
+            //charBack(loops);
             reset_position_to_marker();
         }
         return is_tag;
@@ -63,36 +68,45 @@ namespace mustache {
 
     void Lexer::lex() {
         Mode mode = Mode::TEXT;
-        size_t pos = 0;
+        size_t grab_from_pos = 0;
 
         while (getChar() != EOF) {
             switch (mode) {
                 case Mode::TEXT:
                     if (isTagStart()) {
-                        //It will be zero if a tag is the first element
-                        size_t len = m_position - m_TagEnd.length() - pos;
-                        if (len > 0) {
-                            addElementFromText(pos, len);
-                            //m_elements.emplace_back(m_text.substr(pos, len));
-                            pos = m_position - m_TagEnd.length();
+                        //A tag is the first element
+                        if (m_position - m_TagStart.length() == 0) {
+                            grab_from_pos = m_TagStart.length();
+                        } else {
+                            //If we have multiple tags together there won't be any text to grab
+                            size_t len = m_position - m_TagEnd.length() - grab_from_pos;
+                            if (len > 0) {
+                                addElementFromText(grab_from_pos, len);
+                                grab_from_pos = m_position;
+                            } else {
+                                grab_from_pos += m_TagStart.length();
+                            }
                         }
 
                         mode = Mode::TAG_END_SEARCH;
                     }
+                    //charNext();
                     break;
 
                 case Mode::TAG_END_SEARCH:
                     if (isTagEnd()) {
                         m_total_tags++;
-                        addElementFromText(pos, m_position - pos, LexerElementTypes::TAG);
-                        //m_elements.emplace_back(m_text.substr(pos, m_position - pos), LexerElementTypes::TAG);
+                        size_t len = m_position - m_TagEnd.length() - grab_from_pos;
 
-                        pos = m_position;
+                        addElementFromText(grab_from_pos, len, LexerElementType::TAG);
+
+                        grab_from_pos = m_position;
+
                         mode = Mode::TEXT;
+                        charBack();
                     }
                     break;
             }
-
             charNext();
         }
 
