@@ -2,7 +2,7 @@ BIN=mustachecpp
 BUILD_DIR=./build
 OBJ_DIR=./obj
 TARGET=$(BUILD_DIR)/$(BIN)
-CXXFLAGS=-std=c++14 -Wall -g -Werror
+CXXFLAGS=-std=c++1z -Wall -g -Werror
 LDFLAGS=
 LDLIBS=
 CXX=g++
