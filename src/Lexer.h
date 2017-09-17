@@ -10,6 +10,7 @@
 #include <algorithm> //find_if
 #include <functional>
 #include "LexerElement.h"
+#include <iostream>
 
 namespace mustache {
     constexpr size_t min_string_len = 4;
@@ -58,11 +59,19 @@ namespace mustache {
         }
 
         inline void addElementFromText(size_t start, size_t length, LexerElementType type = LexerElementType::TEXT) noexcept {
-            m_elements.emplace_back(m_text.substr(start, length), type);
+            std::string data{m_text.substr(start, length)};
+
+            std::cout << "DATA: " << data << '\n';
+            trim(data);
+
+
+
+
+            //m_elements.emplace_back(data, type);
         }
 
         //https://stackoverflow.com/a/217605/8715
-        inline void ltrim(std::string &s) {
+        void ltrim(std::string &s) {
             s.erase(
                 s.begin(),
                 std::find_if(
@@ -74,7 +83,8 @@ namespace mustache {
         }
 
         // trim from end (in place)
-        inline void rtrim(std::string &s) {
+
+        void rtrim(std::string &s) {
             //http://en.cppreference.com/w/cpp/iterator/reverse_iterator/base
             s.erase(
                 std::find_if(
@@ -84,7 +94,7 @@ namespace mustache {
                 ).base(), s.end());
         }
 
-        inline void trim(std::string &s) {
+        void trim(std::string &s) {
             ltrim(s);
             rtrim(s);
         }
