@@ -95,13 +95,15 @@ namespace mustache {
                     if (isTagEnd()) {
                         m_total_tags++;
                         size_t len = m_position - m_TagEnd.length() - grab_from_pos;
+                        mode = Mode::TEXT;
 
                         addElementFromText(grab_from_pos, len, LexerElementType::TAG);
 
                         grab_from_pos = m_position;
 
-                        mode = Mode::TEXT;
-                        charBack();
+                        //Skip moving to the next char as we are already in the
+                        //next char thanks to isTagEnd();
+                        continue;
                     }
                     break;
             }
