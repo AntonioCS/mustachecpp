@@ -1,7 +1,7 @@
 #include <string>
 #include "catch.hpp"
 #include "../src/Lexer.h"
-///*
+/*
 TEST_CASE("Lexer return correct elements", "[lexer]") {
     mustache::Lexer lex{"Text1 {{tag1}} Text2 {{Tag2}}"};
     const auto res = lex.getElements();
@@ -20,7 +20,7 @@ TEST_CASE("Lexer return correct elements", "[lexer]") {
     REQUIRE(res.at(3).getType() == mustache::LexerElementType::TAG);
     REQUIRE(res.at(3).getData() == "Tag2");
 }
-///*
+
 TEST_CASE("Tag start", "[lexer]") {
     mustache::Lexer lex{"{{tag0}} Text1 {{tag1}} Text2 {{Tag2}}"};
     const auto res = lex.getElements();
@@ -53,8 +53,8 @@ TEST_CASE("No tags", "[lexer]") {
     REQUIRE(res.at(0).getData() == text);
     REQUIRE(res.at(0).getType() == mustache::LexerElementType::TEXT);
 }
-//*/
-///*
+
+
 TEST_CASE("All tags", "[lexer]") {
     mustache::Lexer lex{"{{tag1}}{{tag2}}{{tag3}}{{tag4}}"};
     const auto res = lex.getElements();
@@ -73,7 +73,7 @@ TEST_CASE("All tags", "[lexer]") {
     REQUIRE(res.at(3).getType() == mustache::LexerElementType::TAG);
     REQUIRE(res.at(3).getData() == "tag4");
 }
-//*/
+
 TEST_CASE("Unfinished tag Exception", "[lexer]") {
     REQUIRE_THROWS_WITH(
             [] {
@@ -82,8 +82,25 @@ TEST_CASE("Unfinished tag Exception", "[lexer]") {
     "Mustache-Lexer - Unfinished tag" //Exception message
     );
 }
+ */
+TEST_CASE("No spaces inside tags", "[lexer]") {
+    mustache::Lexer lex{"{{ tag1 }}{{      tag2   }}{{                tag3  }}{{                            tag4        }}"};
+    const auto res = lex.getElements();
 
+    REQUIRE(res.size() == 4);
 
+    REQUIRE(res.at(0).getType() == mustache::LexerElementType::TAG);
+    REQUIRE(res.at(0).getData() == "tag1");
+
+    REQUIRE(res.at(1).getType() == mustache::LexerElementType::TAG);
+    REQUIRE(res.at(1).getData() == "tag2");
+
+    REQUIRE(res.at(2).getType() == mustache::LexerElementType::TAG);
+    REQUIRE(res.at(2).getData() == "tag3");
+
+    REQUIRE(res.at(3).getType() == mustache::LexerElementType::TAG);
+    REQUIRE(res.at(3).getData() == "tag4");
+}
 
 
 /*
