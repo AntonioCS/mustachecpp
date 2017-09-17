@@ -20,7 +20,6 @@ namespace mustache {
         };
     }
 
-
     enum class Mode {
         TEXT,
         TAG_END_SEARCH
@@ -34,7 +33,6 @@ namespace mustache {
         std::string m_TagEnd{"}}"};
 
         size_t m_position{0};
-        size_t m_position_marker{0};
         std::string::size_type m_size;
 
         std::vector<LexerElement> m_elements;
@@ -47,14 +45,6 @@ namespace mustache {
 
         inline void charNext() noexcept {
             m_position++;
-        }
-
-        inline void mark_position() noexcept {
-            m_position_marker = m_position;
-        }
-
-        inline void reset_position_to_marker() noexcept {
-            m_position = m_position_marker;
         }
 
         bool isTagPart(std::string part) noexcept;
@@ -72,7 +62,6 @@ namespace mustache {
         }
 
         //https://stackoverflow.com/a/217605/8715
-
         inline void ltrim(std::string &s) {
             s.erase(
                 s.begin(),

@@ -29,16 +29,15 @@ namespace mustache {
         }
     }
 
-    bool Lexer::isTagPart(std::string part) noexcept {
-        mark_position();
+    bool Lexer::isTagPart(std::string part) noexcept {        
         int loops{0};
         bool is_tag{false};
 
         for (const char &s : part) {
-            auto c = getChar();
-            loops++;
+            auto c = getChar();            
 
             if (s == c) {
+                loops++;
                 charNext();
                 is_tag = true;
                 continue;
@@ -48,9 +47,8 @@ namespace mustache {
             break;
         }
 
-        if (is_tag == false) {
-            //charBack(loops);
-            reset_position_to_marker();
+        if (is_tag == false) {           
+            charBack(loops);            
         }
         return is_tag;
     }
