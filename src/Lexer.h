@@ -60,14 +60,10 @@ namespace mustache {
 
         inline void addElementFromText(size_t start, size_t length, LexerElementType type = LexerElementType::TEXT) noexcept {
             std::string data{m_text.substr(start, length)};
-
-            std::cout << "DATA: " << data << '\n';
-            trim(data);
-
-
-
-
-            //m_elements.emplace_back(data, type);
+            if (type == LexerElementType::TAG) {
+                trim(data);
+            }
+            m_elements.emplace_back(data, type);
         }
 
         //https://stackoverflow.com/a/217605/8715
