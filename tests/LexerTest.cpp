@@ -1,7 +1,7 @@
 #include <string>
 #include "catch.hpp"
 #include "../src/Lexer.h"
-/*
+
 TEST_CASE("Lexer return correct elements", "[lexer]") {
     mustache::Lexer lex{"Text1 {{tag1}} Text2 {{Tag2}}"};
     const auto res = lex.getElements();
@@ -82,7 +82,7 @@ TEST_CASE("Unfinished tag Exception", "[lexer]") {
     "Mustache-Lexer - Unfinished tag" //Exception message
     );
 }
- */
+
 TEST_CASE("No spaces inside tags", "[lexer]") {
     mustache::Lexer lex{"{{ tag1 }}{{      tag2   }}{{                tag3  }}{{                            tag4        }}"};
     const auto res = lex.getElements();
