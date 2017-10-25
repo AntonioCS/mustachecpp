@@ -28,13 +28,11 @@ Steps to accomplish:
             - Section
                 start {{#name}}
                 end {{/name}}
-
                 Can be multiple things:
                 - False Values or Empty Lists
                 - Non-Empty Lists
                 - Lambdas
                 - Non-False Values
-
             - Inverted Sections
                 start {{^name}}
                 end {{/name}}
