@@ -1,7 +1,7 @@
 #include "Lexer.h"
 #include <iostream>
 
-namespace mustache {
+namespace Mustache {
 
     Lexer::Lexer(const std::string &str) {
         lex(str);

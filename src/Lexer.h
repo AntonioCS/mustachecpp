@@ -11,7 +11,7 @@
 #include <functional>
 #include "LexerElement.h"
 
-namespace mustache {
+namespace Mustache {
     constexpr size_t min_string_len = 4;
 
     namespace {

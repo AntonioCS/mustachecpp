@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace mustache {
+namespace Mustache {
 
     enum class LexerElementType {
         TAG,
